@@ -25,13 +25,13 @@ or visit [this page](https://www.evolsoft.tk/wifi-password-recovery/download/) f
 ## Screenshots
 
 ![1](https://user-images.githubusercontent.com/10297075/47753540-30670e00-dc98-11e8-9250-ba034244c5bc.png)
-*WiFi Password Recovery main screen*
+<br>*WiFi Password Recovery main screen*<br><br>
 
 ![2](https://user-images.githubusercontent.com/10297075/47753659-9e133a00-dc98-11e8-91d7-4bd9e1be6e0c.png)
-*WiFi Password Recovery main screen 2*
+<br>*WiFi Password Recovery main screen 2*<br><br>
 
 ![3](https://user-images.githubusercontent.com/10297075/47753682-b08d7380-dc98-11e8-8acb-adb9bd103ad4.png)
-*WiFi Password Recovery wireless network info screen*
+<br>*WiFi Password Recovery wireless network info screen*<br><br>
 
 ## Compiling source code
 

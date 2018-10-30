@@ -52,7 +52,9 @@ and
 mingw32-make
 ```
 
-If compilation succeeds, you will find the generated object files into *obj/* folder and the main executable into *bin/* folder.
+If the compilation succeeds, you will find the generated object files into *obj/* folder and the main executable into *bin/* folder.
+
+Don't forget to add the runtime libraries inside the executable path before running it otherwise it will not work.
 
 ## License
 
@@ -73,8 +75,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## 3rd-party libraries used
 
-- wxWidgets
-- pugixml
+- [wxWidgets](https://www.wxwidgets.org)
+- [pugixml](http://pugixml.org)
 
 ## Donate
 

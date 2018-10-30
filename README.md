@@ -8,15 +8,51 @@ WiFi Password Recovery is a free utility to recover the passwords of the WiFi ne
 
 **Note: On Windows XP the passwords of WiFi networks using WPA security will be shown as 64 HEX digits. You can use these characters as password to connect to the wireless network anyway.**
 
+## Requirements
+
+- Windows XP SP3, Vista, 7, 8.x, 10
+- A wireless network card of course
+
 ## Precompiled binaries
 
-//TODO
+Precompiled binaries of WiFi Password Recovery are available for download as installer version or portable version.
+Click the button below to download the installer:
 
 [![Download WiFi Password Recovery](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/wifi-password-recovery/files/latest/download)
 
-## Compiling
+or visit [this page](https://www.evolsoft.tk/wifi-password-recovery/download/) for more download options.
 
-//TODO
+## Screenshots
+
+![1](https://user-images.githubusercontent.com/10297075/47753540-30670e00-dc98-11e8-9250-ba034244c5bc.png)
+*WiFi Password Recovery main screen*
+
+![2](https://user-images.githubusercontent.com/10297075/47753659-9e133a00-dc98-11e8-91d7-4bd9e1be6e0c.png)
+*WiFi Password Recovery main screen 2*
+
+![3](https://user-images.githubusercontent.com/10297075/47753682-b08d7380-dc98-11e8-8acb-adb9bd103ad4.png)
+*WiFi Password Recovery wireless network info screen*
+
+## Compiling source code
+
+To compile WiFi Password Recovery source code you need:
+- *MinGW-w64* compiler 
+- *wxWidgets* 2.8
+- *pugixml* library
+
+Before compiling source code you may need to modify the *Makefile* in order to set the right compiler and libraries paths. After doing that, run:
+
+```
+mingw32-make clean
+```
+
+and
+
+```
+mingw32-make
+```
+
+If compilation succeeds, you will find the generated object files into *obj/* folder and the main executable into *bin/* folder.
 
 ## License
 
@@ -35,6 +71,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ```
 
+## 3rd-party libraries used
+
+- wxWidgets
+- pugixml
+
 ## Donate
 
 If you want you can support this project with a small donation by clicking [:dollar: here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=flavius.c.1999@gmail.com&lc=US&item_name=www.evolsoft.tk&no_note=0&cn=&curency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted). 
@@ -42,4 +83,4 @@ Your generosity will help us paying web hosting, domains, buying programs (such 
 
 ## Contributing
 
-If you want to contribute to this project please follow the [Contribution Guidelines](https://github.com/EvolSoft/PharTools/blob/master/CONTRIBUTING.md).
+If you want to contribute to this project please follow the [Contribution Guidelines](https://github.com/EvolSoft/WiFi-Password-Recovery/blob/master/CONTRIBUTING.md).

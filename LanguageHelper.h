@@ -20,20 +20,40 @@
  *
  **************************************************************/
 
-#ifndef WPRAPP_H
-#define WPRAPP_H
+#ifndef LANGUAGEHELPER_H
+#define LANGUAGEHELPER_H
 
-#include <wx/app.h>
-#include <wx/fileconf.h>
-#include <wx/string.h>
+#include "WPRMain.h"
 
-class WPRApp : public wxApp {
-    public:
-        virtual bool OnInit();
-    private:
-        wxFileConfig* config;
-        void InitConfig();
-        bool IsElevated();
-        bool RunAsAdmin(wxString arg);
+#include <vector>
+#include <wx/menu.h>
+
+using namespace std;
+
+struct Language {
+    wxChar* name;
+    int langId;
 };
-#endif //WPRAPP_H
+
+class LanguageHelper : public wxObject {
+    public:
+        static LanguageHelper* GetInstance();
+        bool IsInstalled(int language);
+        wxString GetLocalePath();
+        bool ApplyLanguage(int lang);
+        static vector<Language> GetSupportedLanguages();
+        static int GetSupportedLanguagesCount();
+        vector<Language> GetAvailableLanguages();
+        int GetAvailableLanguagesCount();
+        int GetCurrentLanguage();
+        static int GetDefaultLanguage();
+    private:
+        static LanguageHelper* instance;
+        static vector<Language> languages;
+        vector<Language> avLanguages;
+        int curLang;
+        wxLocale* locale;
+        LanguageHelper();
+        void InitAvaliableLanguages();
+};
+#endif

@@ -20,20 +20,29 @@
  *
  **************************************************************/
 
-#ifndef WPRAPP_H
-#define WPRAPP_H
+#ifndef WELCOMEDIALOG_H
+#define WELCOMEDIALOG_H
 
-#include <wx/app.h>
+#include <wx/button.h>
+#include <wx/checkbox.h>
+#include <wx/dialog.h>
 #include <wx/fileconf.h>
-#include <wx/string.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 
-class WPRApp : public wxApp {
-    public:
-        virtual bool OnInit();
-    private:
-        wxFileConfig* config;
-        void InitConfig();
-        bool IsElevated();
-        bool RunAsAdmin(wxString arg);
+class WelcomeDialog : public wxDialog {
+	public:
+		WelcomeDialog(wxWindow* parent, wxFileConfig* config);
+		virtual ~WelcomeDialog();
+	private:
+	    wxFileConfig* config;
+	    wxCheckBox* showAgainCheckBox;
+		void OnInit(wxInitDialogEvent& event);
+		void OnClose(wxCloseEvent& event);
+		void OnButtonCloseClick(wxCommandEvent& event);
+		void OnButtonDonateClick(wxCommandEvent& event);
+		DECLARE_EVENT_TABLE()
 };
-#endif //WPRAPP_H
+#endif //WELCOMEDIALOG_H

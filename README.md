@@ -20,25 +20,27 @@ Click the button below to download the installer:
 
 [![Download WiFi Password Recovery](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/wifi-password-recovery/files/latest/download)
 
-or visit [this page](https://www.evolsoft.tk/wifi-password-recovery/download/) for more download options.
+or visit [this page](https://www.evolsoft.org/wifi-password-recovery/download/) for more download options.
 
 ## Screenshots
 
-![1](https://user-images.githubusercontent.com/10297075/47753540-30670e00-dc98-11e8-9250-ba034244c5bc.png)
+![1](https://user-images.githubusercontent.com/10297075/68071383-4fe8b900-fd7a-11e9-8e75-24a38be27a50.png)
 <br>*WiFi Password Recovery main screen*<br><br>
 
-![2](https://user-images.githubusercontent.com/10297075/47753659-9e133a00-dc98-11e8-91d7-4bd9e1be6e0c.png)
+![2](https://user-images.githubusercontent.com/10297075/68071389-5840f400-fd7a-11e9-8d1f-205adf83a29c.png)
 <br>*WiFi Password Recovery main screen 2*<br><br>
 
-![3](https://user-images.githubusercontent.com/10297075/47753682-b08d7380-dc98-11e8-8acb-adb9bd103ad4.png)
+![3](https://user-images.githubusercontent.com/10297075/68071393-62fb8900-fd7a-11e9-96e0-9fb0781b37dc.png)
 <br>*WiFi Password Recovery wireless network info screen*<br><br>
+
+![4](https://user-images.githubusercontent.com/10297075/68071419-7dcdfd80-fd7a-11e9-88f8-965b99fe3ea8.png)
+<br>*WiFi Password Recovery Wireless Networks Import Wizard*<br><br>
 
 ## Compiling source code
 
 To compile WiFi Password Recovery source code you need:
 - *MinGW-w64* compiler 
 - *wxWidgets* 2.8
-- *pugixml* library
 
 Before compiling source code you may need to modify the *Makefile* in order to set the right compiler and libraries paths. After doing that, run:
 
@@ -76,11 +78,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## 3rd-party libraries used
 
 - [wxWidgets](https://www.wxwidgets.org)
-- [pugixml](http://pugixml.org)
 
 ## Donate
 
-If you want you can support this project with a small donation by clicking [:dollar: here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=flavius.c.1999@gmail.com&lc=US&item_name=www.evolsoft.tk&no_note=0&cn=&curency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted). 
+If you want you can support this project with a small donation by clicking [:dollar: here](https://www.paypal.me/Flavius12). 
 Your generosity will help us paying web hosting, domains, buying programs (such as IDEs, debuggers, etc...) and new hardware to improve software development. Thank you :smile:
 
 ## Contributing

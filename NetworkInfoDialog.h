@@ -3,7 +3,7 @@
  * WiFi Password Recovery
  *
  * Author:    Flavio Collocola
- * Copyright: (C) 2018 EvolSoft (https://www.evolsoft.tk)
+ * Copyright: (C) 2018-2019 EvolSoft (www.evolsoft.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
  *
  **************************************************************/
 
-#ifndef WPRWLANDIALOG_H
-#define WPRWLANDIALOG_H
+#ifndef NETWORKINFODIALOG_H
+#define NETWORKINFODIALOG_H
 
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -30,10 +30,10 @@
 
 #include "WlanInfo.h"
 
-class WPRWlanDialog : public wxDialog {
+class NetworkInfoDialog : public wxDialog {
 	public:
-	    WlanNetwork* wn;
         wxButton* ButtonClose;
+        wxButton* ButtonSave;
 		wxStaticText* LabelEncryptVal;
 		wxStaticText* LabelInterfaceVal;
 		wxStaticText* LabelSSIDVal;
@@ -44,23 +44,12 @@ class WPRWlanDialog : public wxDialog {
 		wxStaticText* LabelSecurity;
 		wxStaticText* LabelSSID;
 		wxTextCtrl* TextBoxPasswordVal;
-		WPRWlanDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
-		virtual ~WPRWlanDialog();
-	protected:
-	    static const long ID_BUTTONCLOSE;
-        static const long ID_LABELENCRYPT;
-		static const long ID_LABELENCRYPTVAL;
-        static const long ID_LABELINTERFACE;
-		static const long ID_LABELINTERFACEVAL;
-        static const long ID_LABELPASSWORD;
-		static const long ID_LABELSECURITY;
-        static const long ID_LABELSECURITYVAL;
-        static const long ID_LABELSSID;
-        static const long ID_LABELSSIDVAL;
-        static const long ID_TEXTBOXPASSWORDVAL;
+		NetworkInfoDialog(wxWindow* parent, WlanNetwork* networkInfo);
+		virtual ~NetworkInfoDialog();
 	private:
-		void OnInit(wxInitDialogEvent& event);
+	    WlanNetwork* networkInfo;
 		void OnButtonCloseClick(wxCommandEvent& event);
+		void OnButtonSaveClick(wxCommandEvent& event);
 		DECLARE_EVENT_TABLE()
 };
-#endif //WPRWLANDIALOG_H
+#endif //NETWORKINFODIALOG_H

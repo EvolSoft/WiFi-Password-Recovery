@@ -20,20 +20,21 @@
  *
  **************************************************************/
 
-#ifndef WPRAPP_H
-#define WPRAPP_H
+#ifndef NETWORKDATAFORMAT_H
+#define NETWORKDATAFORMAT_H
 
-#include <wx/app.h>
-#include <wx/fileconf.h>
+#include <vector>
 #include <wx/string.h>
+#include <wx/wfstream.h>
 
-class WPRApp : public wxApp {
-    public:
-        virtual bool OnInit();
-    private:
-        wxFileConfig* config;
-        void InitConfig();
-        bool IsElevated();
-        bool RunAsAdmin(wxString arg);
+using namespace std;
+
+struct NetworkDataItem;
+
+class NetworkDataFormat {
+public:
+    virtual int Export(wxFileOutputStream* fileStream, vector<NetworkDataItem> networks, bool encrypt) = 0;
+    virtual vector<NetworkDataItem> Import(wxFileInputStream* fileStream, int* status) = 0;
+    static int GetVersion();
 };
-#endif //WPRAPP_H
+#endif //NETWORKDATAFORMAT_H

@@ -20,20 +20,15 @@
  *
  **************************************************************/
 
-#ifndef WPRAPP_H
-#define WPRAPP_H
+#ifndef VERSION_H
+#define VERSION_H
 
-#include <wx/app.h>
-#include <wx/fileconf.h>
-#include <wx/string.h>
+#define WPR_VERSION "2.0"
+#define WPR_WEBSITE "www.evolsoft.org"
+#define WPR_WEBSITE_URL "https://www.evolsoft.org"
+#define WPR_DONATION_URL "https://www.paypal.me/Flavius12" //https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=flavius.c.1999@gmail.com&lc=US&item_name=www.evolsoft.tk&no_note=0&cn=&curency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted
+#define WPR_TRANSLATIONS_URL WPR_WEBSITE_URL "/wifi-password-recovery/translate/"
+#define WPR_SOURCECODE_URL "https://github.com/EvolSoft/WiFi-Password-Recovery"
+#define WPR_ISSUES_URL WPR_SOURCECODE_URL "/issues"
 
-class WPRApp : public wxApp {
-    public:
-        virtual bool OnInit();
-    private:
-        wxFileConfig* config;
-        void InitConfig();
-        bool IsElevated();
-        bool RunAsAdmin(wxString arg);
-};
-#endif //WPRAPP_H
+#endif  //VERSION_H

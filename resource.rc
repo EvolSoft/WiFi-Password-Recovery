@@ -1,3 +1,4 @@
 APP_ICON ICON "icon.ico"
+WIZARD_BITMAP BITMAP "wizard.bmp"
 
 #include "wx/msw/wx.rc"

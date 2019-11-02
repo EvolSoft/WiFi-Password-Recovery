@@ -3,7 +3,7 @@
  * WiFi Password Recovery
  *
  * Author:    Flavio Collocola
- * Copyright: (C) 2018 EvolSoft (https://www.evolsoft.tk)
+ * Copyright: (C) 2018-2019 EvolSoft (www.evolsoft.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,40 +20,25 @@
  *
  **************************************************************/
 
-#ifndef WPRINFODIALOG_H
-#define WPRINFODIALOG_H
+#ifndef ABOUTDIALOG_H
+#define ABOUTDIALOG_H
 
 #include <wx/button.h>
+#include <wx/colour.h>
 #include <wx/dialog.h>
 #include <wx/hyperlink.h>
+#include <wx/settings.h>
 #include <wx/statbmp.h>
 #include <wx/stattext.h>
+#include <wx/textctrl.h>
 
-class WPRInfoDialog : public wxDialog {
+class AboutDialog : public wxDialog {
 	public:
-        wxStaticBitmap* BitmapIcon;
-		wxButton* ButtonClose;
-		wxButton* ButtonDonate;
-        wxHyperlinkCtrl* Hyperlink1;
-		wxStaticText* Label1;
-		wxStaticText* Label2;
-		wxStaticText* Label3;
-		wxStaticText* Label4;
-		WPRInfoDialog(wxWindow* parent, wxWindowID id = wxID_ANY);
-		virtual ~WPRInfoDialog();
-	protected:
-        static const long ID_BITMAPICON;
-		static const long ID_BUTTONCLOSE;
-        static const long ID_BUTTONDONATE;
-        static const long ID_HYPERLINK1;
-		static const long ID_LABEL1;
-		static const long ID_LABEL2;
-		static const long ID_LABEL3;
-		static const long ID_LABEL4;
+		AboutDialog(wxWindow* parent);
+		virtual ~AboutDialog();
 	private:
-		void OnInit(wxInitDialogEvent& event);
 		void OnButtonCloseClick(wxCommandEvent& event);
 		void OnButtonDonateClick(wxCommandEvent& event);
 		DECLARE_EVENT_TABLE()
 };
-#endif //WPRINFODIALOG_H
+#endif //ABOUTDIALOG_H

@@ -3,7 +3,7 @@
  * WiFi Password Recovery
  *
  * Author:    Flavio Collocola
- * Copyright: (C) 2018 EvolSoft (https://www.evolsoft.tk)
+ * Copyright: (C) 2018-2019 EvolSoft (www.evolsoft.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,34 +23,49 @@
 #ifndef WPRMAIN_H
 #define WPRMAIN_H
 
+#include <map>
 #include <wx/button.h>
+#include <wx/fileconf.h>
 #include <wx/frame.h>
 #include <wx/listctrl.h>
 #include <wx/menu.h>
 #include <wx/stattext.h>
 
+using namespace std;
+
+typedef struct {
+    wxListView* listView;
+    int col;
+} SortInfo;
+
 class WPRMain : public wxFrame {
     public:
-        WPRMain(wxWindow* parent, wxWindowID id = -1);
+        WPRMain(wxWindow* parent, wxFileConfig* config);
         virtual ~WPRMain();
     private:
         static bool sortDesc;
-        static const long ID_BUTTONRECOVER;
-        static const long ID_BUTTONSCAN;
-        static const long ID_LABEL1;
-        static const long ID_LISTVIEWNETWORKS;
-        static const long ID_MENUITEMABOUT;
-        static const long ID_MENUITEMQUIT;
         static int wxCALLBACK ListViewCompare(wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData);
         static int lastCol;
         wxButton* ButtonRecover;
         wxButton* ButtonScan;
+        wxFileConfig* config;
         wxStaticText* Label1;
         wxListView* ListViewNetworks;
-        wxMenu* Menu1;
-        wxMenuBar* MenuBar1;
+        wxMenu* MenuFile;
+        wxMenu* MenuHelp;
+        wxMenu* MenuLanguage;
+        wxMenuBar* MenuBar;
         wxMenuItem* MenuItemAbout;
+        wxMenuItem* MenuItemBug;
+        wxMenuItem* MenuItemDonate;
+        wxMenuItem* MenuItemExportNetworks;
+        wxMenuItem* MenuItemImportNetworks;
         wxMenuItem* MenuItemQuit;
+        wxMenuItem* MenuItemScan;
+        wxMenuItem* MenuItemWebsite;
+        map<int, int> menuLanguageItemLink;
+        void InitLanguageMenu(wxMenu* languageMenu);
+        void MenuLanguageHandler(wxCommandEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
         void OnButtonRecoverClick(wxCommandEvent& event);
@@ -60,9 +75,15 @@ class WPRMain : public wxFrame {
         void OnListViewNetworksItemDeselect(wxListEvent& event);
         void OnListViewNetworksItemSelect(wxListEvent& event);
         void OnMenuItemAboutSelected(wxCommandEvent& event);
+        void OnMenuItemBugSelected(wxCommandEvent& event);
+        void OnMenuItemDonateSelected(wxCommandEvent& event);
+        void OnMenuItemExportNetworksSelected(wxCommandEvent& event);
+        void OnMenuItemImportNetworksSelected(wxCommandEvent& event);
+        void OnMenuItemWebsiteSelected(wxCommandEvent& event);
         void ShowNetworkInfo();
         void SortItems(int col);
         void UpdateNetworksList();
+        void UpdateUITexts();
         DECLARE_EVENT_TABLE()
 };
 #endif //WPRMAIN_H

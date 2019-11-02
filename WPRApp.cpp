@@ -3,7 +3,7 @@
  * WiFi Password Recovery
  *
  * Author:    Flavio Collocola
- * Copyright: (C) 2018 EvolSoft (https://www.evolsoft.tk)
+ * Copyright: (C) 2018-2019 EvolSoft (www.evolsoft.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,10 @@
 
 #include "WPRApp.h"
 
+#include "LanguageHelper.h"
+#include "NetworkWizard.h"
 #include "WPRMain.h"
+#include "WelcomeDialog.h"
 #include "WlanInfo.h"
 
 //For a future cross-platform support
@@ -31,10 +34,11 @@
 #include <VersionHelpers.h>
 //#endif
 
-#include <wx/msgdlg.h>
+#include <wx/fileconf.h>
+#include <wx/filename.h>
 #include <wx/image.h>
-
-#include <stdio.h>
+#include <wx/msgdlg.h>
+#include <wx/stdpaths.h>
 
 IMPLEMENT_APP(WPRApp);
 
@@ -54,7 +58,7 @@ bool WPRApp::IsElevated(){
     return status;
 }
 
-bool WPRApp::RunAsAdmin(){
+bool WPRApp::RunAsAdmin(wxString arg){
     wchar_t curPath[MAX_PATH];
     if(GetModuleFileName(NULL, curPath, sizeof(curPath))){
         SHELLEXECUTEINFO shExecInfo;
@@ -63,7 +67,11 @@ bool WPRApp::RunAsAdmin(){
         shExecInfo.hwnd = NULL;
         shExecInfo.lpVerb = L"runas";
         shExecInfo.lpFile = curPath;
-        shExecInfo.lpParameters = NULL;
+        if(arg.IsEmpty()){
+            shExecInfo.lpParameters = NULL;
+        }else{
+            shExecInfo.lpParameters = (wchar_t*) arg.wchar_str();
+        }
         shExecInfo.lpDirectory = NULL;
         shExecInfo.nShow = SW_SHOW;
         shExecInfo.hInstApp = NULL;
@@ -72,30 +80,65 @@ bool WPRApp::RunAsAdmin(){
     return false;
 }
 
+void WPRApp::InitConfig(){
+    int localeCfg;
+    bool welcomeMessage;
+    if(config->Read(wxT("locale"), &localeCfg)){ //Language configuration
+        if(!LanguageHelper::GetInstance()->ApplyLanguage(localeCfg)){
+            config->Write(wxT("locale"), LanguageHelper::GetDefaultLanguage());
+        }
+    }else if(LanguageHelper::GetInstance()->ApplyLanguage(localeCfg)){
+        config->Write(wxT("locale"), localeCfg);
+    }else{
+        config->Write(wxT("locale"), LanguageHelper::GetDefaultLanguage());
+    }
+    if(!config->Read(wxT("welcome_message"), &welcomeMessage)){
+        config->Write(wxT("welcome_message"), true);
+    }
+}
+
 bool WPRApp::OnInit(){
+    bool showWelcomeDialog = true;
+    wxString arg = wxEmptyString;
     wxInitAllImageHandlers();
+    wxFileName configPath = wxStandardPaths::Get().GetExecutablePath();
+    config = new wxFileConfig(wxEmptyString, wxEmptyString, configPath.GetPath().Append(wxT("/config.ini")));
+    InitConfig();
     if(!IsWindowsXPSP3OrGreater()){
-        wxMessageBox(wxT("This program can only run on Windows XP SP3 or later."), wxT("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("This program can only run on Windows XP SP3 or later."), wxT("WiFi Password Recovery"), wxOK | wxICON_ERROR);
         return false;
     }
-    if(!IsElevated()){
-        RunAsAdmin();
+    if(argc >= 2){
+        arg = argv[1];
+    }
+    if(IsWindowsVistaOrGreater() && !IsElevated()){ //Windows XP handles Admin permissions differently
+        RunAsAdmin(arg);
         return false;
     }
     switch(WlanInfo::InitWlanInterface()){
         case ERR_WI_WLAN_INIT:
-            wxMessageBox(wxT("Failed to initialize WLAN Interfaces.\n\nTry to run the program as administrator."), wxT("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(_("Failed to initialize Wlan Interfaces.\n\nTry to run the program as administrator."), wxT("WiFi Password Recovery"), wxOK | wxICON_ERROR);
             return false;
         case ERR_WI_ENUM_INIT:
-            wxMessageBox(wxT("Failed to enumerate WLAN Interfaces."), wxT("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(_("Failed to enumerate Wlan Interfaces.\n\nTry to run the program as administrator."), wxT("WiFi Password Recovery"), wxOK | wxICON_ERROR);
             return false;
         case ERR_WI_NO_INT:
-            wxMessageBox(wxT("No WLAN interfaces found."), wxT("Warning"), wxOK | wxICON_WARNING);
+            wxMessageBox(_("No Wlan interfaces found."), wxT("WiFi Password Recovery"), wxOK | wxICON_WARNING);
             return false;
     }
-    WPRMain* Frame = new WPRMain(0);
-    Frame->Show();
-    SetTopWindow(Frame);
-    Frame->CenterOnScreen();
+    if(arg.IsEmpty()){ //If argument is empty, show default windows
+        WPRMain* Frame = new WPRMain(0, config);
+        Frame->Show();
+        SetTopWindow(Frame);
+        Frame->CenterOnScreen();
+        config->Read(wxT("welcome_message"), &showWelcomeDialog); //Show welcome dialog
+        if(showWelcomeDialog){
+            WelcomeDialog welcomeDialog(Frame, config);
+            welcomeDialog.ShowModal();
+        }
+    }else{
+        NetworkWizard* networkWizard = new NetworkWizard(NULL, arg);
+        return false;
+    }
     return true;
 }

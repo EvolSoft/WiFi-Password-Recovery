@@ -3,7 +3,7 @@
  * WiFi Password Recovery
  *
  * Author:    Flavio Collocola
- * Copyright: (C) 2018 EvolSoft (https://www.evolsoft.tk)
+ * Copyright: (C) 2018-2019 EvolSoft (www.evolsoft.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,19 @@
 #ifndef WLANINFO_H
 #define WLANINFO_H
 
-#include "pugixml.hpp"
-
-#include <stdlib.h>
-#include <string.h>
+#include <wx/intl.h>
+#include <wx/string.h>
 
 //For a future cross-platform support
 //#ifdef WINDOWS
 #include <windows.h>
-#include <wlanapi.h>
-#include <wincrypt.h>
 #include <VersionHelpers.h>
+#include <tlhelp32.h>
+#include <wincrypt.h>
+#include <wlanapi.h>
 //#endif WINDOWS
+
+#define MAX_PASSWORD_LENGTH 64  //Maximum password length is 64 bytes
 
 #define ERR_WI_SUCCESS 0
 #define ERR_WI_NOT_INIT 1       //Wlan Info not initialized
@@ -42,6 +43,8 @@
 #define ERR_WI_ENUM_INIT 3       //WlanEnumInterfaces failed
 #define ERR_WI_NO_INT 4         //No Wlan Interfaces found
 #define ERR_WI_GET_NETWORKS 5   //WlanGetNetworks failed
+#define ERR_WI_ALREADY_EXISTS 6 //Wlan profile already exists when importing
+#define ERR_WI_GENERIC 7        //Generic wlan error
 
 //For a future cross-platform support
 typedef enum {
@@ -67,7 +70,7 @@ typedef enum {
 typedef struct {
     wchar_t name[WLAN_MAX_NAME_LENGTH];
     wchar_t intrface[WLAN_MAX_NAME_LENGTH];
-    wchar_t password[64];         //Maximum password length is 64 bytes
+    wchar_t password[MAX_PASSWORD_LENGTH];
     bool dcerror;
     WlanAuth auth;
     WlanEncryption encryption;
@@ -82,8 +85,10 @@ class WlanInfo {
         static WlanNetwork* GetNetworksList();
         static int UpdateNetworksList();
         static WlanNetwork* GetNetworkInfo(wchar_t* name);
-        static char* WlanAuthToString(WlanAuth auth);
-        static char* WlanEncryptionToString(WlanEncryption encryption);
+        static wxString WlanAuthToString(WlanAuth auth);
+        static wxString WlanEncryptionToString(WlanEncryption encryption);
+        static int Import(WlanNetwork network);
+        static int Import(WlanNetwork network, bool overwrite);
         static bool Destroy();
     private:
         static bool init;
@@ -92,5 +97,8 @@ class WlanInfo {
         static int status;
         static int wnCount;
         static WlanNetwork* wnItems;
+        static DWORD GetProcessID(wchar_t* szName);
+        static bool SetPrivilege(wchar_t* szPrivilege);
+        static bool ImpersonateLoginUser();
 };
 #endif // WLANINFO_H

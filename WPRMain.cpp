@@ -3,7 +3,7 @@
  * WiFi Password Recovery
  *
  * Author:    Flavio Collocola
- * Copyright: (C) 2018 EvolSoft (https://www.evolsoft.tk)
+ * Copyright: (C) 2018-2019 EvolSoft (www.evolsoft.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,59 +20,78 @@
  *
  **************************************************************/
 
+#include "WPRApp.h"
 #include "WPRMain.h"
 
+#include "AboutDialog.h"
+#include "LanguageHelper.h"
+#include "NetworkInfoDialog.h"
+#include "NetworkWizard.h"
+#include "Version.h"
+#include "WelcomeDialog.h"
 #include "WlanInfo.h"
-#include "WPRInfoDialog.h"
-#include "WPRWlanDialog.h"
 
-#include <wx/intl.h>
 #include <wx/icon.h>
+#include <wx/intl.h>
 #include <wx/msgdlg.h>
 #include <wx/settings.h>
 #include <wx/sizer.h>
+#include <wx/statusbr.h>
 #include <wx/string.h>
 
 bool WPRMain::sortDesc = false;
-const long WPRMain::ID_BUTTONRECOVER = wxNewId();
-const long WPRMain::ID_BUTTONSCAN = wxNewId();
-const long WPRMain::ID_LABEL1 = wxNewId();
-const long WPRMain::ID_LISTVIEWNETWORKS = wxNewId();
-const long WPRMain::ID_MENUITEMABOUT = wxNewId();
-const long WPRMain::ID_MENUITEMQUIT = wxNewId();
 int WPRMain::lastCol = 0;
 
-BEGIN_EVENT_TABLE(WPRMain,wxFrame)
+BEGIN_EVENT_TABLE(WPRMain, wxFrame)
 END_EVENT_TABLE()
 
-WPRMain::WPRMain(wxWindow* parent, wxWindowID id){
+WPRMain::WPRMain(wxWindow* parent, wxFileConfig* config){
     wxBoxSizer* BoxSizerV, *BoxSizerH;
-    Create(parent, wxID_ANY, _("WiFi Password Recovery [v1.0]"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX | wxSTATIC_BORDER, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, wxT("WiFi Password Recovery"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX | wxSTATIC_BORDER);
+    this->config = config;
     SetIcon(wxICON(APP_ICON));
-    SetClientSize(wxSize(450, 325));
+    SetClientSize(wxSize(475, 350));
     wxFont mainFont = wxFont();
     mainFont.SetPointSize(8);
 	SetFont(mainFont);
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-    Menu1 = new wxMenu();
-    MenuBar1 = new wxMenuBar();
-    MenuItemAbout = new wxMenuItem(Menu1, ID_MENUITEMABOUT, _("Info"), wxEmptyString, wxITEM_NORMAL);
-    MenuItemQuit = new wxMenuItem(Menu1, ID_MENUITEMQUIT, _("Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
-    Menu1->Append(MenuItemAbout);
-    Menu1->AppendSeparator();
-    Menu1->Append(MenuItemQuit);
-    MenuBar1->Append(Menu1, _("\?"));
-    SetMenuBar(MenuBar1);
-    ButtonRecover = new wxButton(this, ID_BUTTONRECOVER, _("Recover"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTONRECOVER"));
+    MenuBar = new wxMenuBar();
+    MenuFile = new wxMenu();
+    MenuHelp = new wxMenu();
+    MenuLanguage = new wxMenu();
+    MenuItemWebsite = new wxMenuItem(MenuHelp, wxID_ANY, wxString::Format(_("Visit %s Website"), wxT("EvolSoft")), wxEmptyString, wxITEM_NORMAL);
+    MenuItemBug = new wxMenuItem(MenuHelp, wxID_ANY, _("Report a bug..."), wxEmptyString, wxITEM_NORMAL);
+    MenuItemDonate = new wxMenuItem(MenuHelp, wxID_ANY, _("Donate"), wxEmptyString, wxITEM_NORMAL);
+    MenuItemAbout = new wxMenuItem(MenuHelp, wxID_ANY, wxString::Format(_("About %s..."), wxT("WiFi Password Recovery")), wxEmptyString, wxITEM_NORMAL);
+    MenuItemScan = new wxMenuItem(MenuFile, wxID_ANY, wxString::Format(wxT("%s\tF1"), _("Scan")), wxEmptyString, wxITEM_NORMAL);
+    MenuItemExportNetworks = new wxMenuItem(MenuFile, wxID_ANY, wxString::Format(wxT("%s\tF3"), _("Export networks...")), wxEmptyString, wxITEM_NORMAL);
+    MenuItemImportNetworks = new wxMenuItem(MenuFile, wxID_ANY, wxString::Format(wxT("%s\tF2"), _("Import networks...")), wxEmptyString, wxITEM_NORMAL);
+    MenuItemQuit = new wxMenuItem(MenuFile, wxID_ANY, wxString::Format(wxT("%s\tCtrl+Q"), _("Quit")), wxEmptyString, wxITEM_NORMAL);
+    MenuHelp->Append(MenuItemWebsite);
+    MenuHelp->Append(MenuItemBug);
+    MenuHelp->Append(MenuItemDonate);
+    MenuHelp->AppendSeparator();
+    MenuHelp->Append(MenuItemAbout);
+    MenuFile->Append(MenuItemScan);
+    MenuFile->Append(MenuItemImportNetworks);
+    MenuFile->Append(MenuItemExportNetworks);
+    MenuFile->AppendSeparator();
+    MenuFile->Append(MenuItemQuit);
+    MenuBar->Append(MenuFile, _("File"));
+    MenuBar->Append(MenuLanguage, _("Language"));
+    MenuBar->Append(MenuHelp, _("Help"));
+    InitLanguageMenu(MenuLanguage);
+    SetMenuBar(MenuBar);
+    ButtonRecover = new wxButton(this, wxID_ANY, _("Recover"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator);
     ButtonRecover->SetDefault();
     ButtonRecover->Disable();
-    ButtonScan = new wxButton(this, ID_BUTTONSCAN, _("Scan"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTONSCAN"));
-    Label1 = new wxStaticText(this, ID_LABEL1, _("Select a network from the list to show its info:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_LABEL1"));
-    ListViewNetworks = new wxListView(this, ID_LISTVIEWNETWORKS, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL | wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_LISTVIEWNETWORKS"));
-    ListViewNetworks->InsertColumn(0, wxT("Name"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
-    ListViewNetworks->InsertColumn(1, wxT("Security"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
-    ListViewNetworks->InsertColumn(2, wxT("Encryption"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
-    ListViewNetworks->InsertColumn(3, wxT("Interface"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
+    ButtonScan = new wxButton(this, wxID_ANY, _("Scan"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator);
+    Label1 = new wxStaticText(this, wxID_ANY, _("Select a network from the list to show its info:"), wxDefaultPosition, wxDefaultSize);
+    ListViewNetworks = new wxListView(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL | wxTAB_TRAVERSAL, wxDefaultValidator);
+    ListViewNetworks->InsertColumn(0, _("Name"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
+    ListViewNetworks->InsertColumn(1, _("Security"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
+    ListViewNetworks->InsertColumn(2, _("Encryption"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
+    ListViewNetworks->InsertColumn(3, _("Interface"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
     //Alignment
     BoxSizerV = new wxBoxSizer(wxVERTICAL);
     BoxSizerH = new wxBoxSizer(wxHORIZONTAL);
@@ -82,24 +101,105 @@ WPRMain::WPRMain(wxWindow* parent, wxWindowID id){
     BoxSizerV->Add(ListViewNetworks, 1, wxEXPAND | wxALIGN_BOTTOM | wxLEFT | wxRIGHT | wxBOTTOM, 8);
     BoxSizerV->Add(BoxSizerH, 0, wxALIGN_RIGHT | wxALIGN_BOTTOM | wxRIGHT | wxBOTTOM, 8);
     SetSizer(BoxSizerV);
+    SetStatusBarPane(-1);   //Remove status bar help text when using menu
+    CreateStatusBar(1, wxSB_NORMAL);
+    SetStatusText(wxT(" EvolSoft WiFi Password Recovery " WPR_VERSION " | " WPR_WEBSITE));
     //End alignment
-    Connect(ID_BUTTONRECOVER, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction) &WPRMain::OnButtonRecoverClick);
-    Connect(ID_BUTTONSCAN, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction) &WPRMain::OnButtonScanClick);
-    Connect(ID_LISTVIEWNETWORKS, wxEVT_COMMAND_LIST_COL_CLICK, (wxObjectEventFunction) &WPRMain::OnListViewNetworksColumnClick);
-    Connect(ID_LISTVIEWNETWORKS, wxEVT_COMMAND_LIST_ITEM_ACTIVATED, (wxObjectEventFunction) &WPRMain::OnListViewNetworksItemActivated);
-    Connect(ID_LISTVIEWNETWORKS, wxEVT_COMMAND_LIST_ITEM_DESELECTED, (wxObjectEventFunction) &WPRMain::OnListViewNetworksItemDeselect);
-    Connect(ID_LISTVIEWNETWORKS, wxEVT_COMMAND_LIST_ITEM_SELECTED, (wxObjectEventFunction) &WPRMain::OnListViewNetworksItemSelect);
-    Connect(ID_MENUITEMABOUT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnMenuItemAboutSelected);
-    Connect(ID_MENUITEMQUIT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnQuit);
+    ButtonRecover->Connect(wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction) &WPRMain::OnButtonRecoverClick, NULL, this);
+    ButtonScan->Connect(wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction) &WPRMain::OnButtonScanClick, NULL, this);
+    ListViewNetworks->Connect(wxEVT_COMMAND_LIST_COL_CLICK, (wxObjectEventFunction) &WPRMain::OnListViewNetworksColumnClick, NULL, this);
+    ListViewNetworks->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, (wxObjectEventFunction) &WPRMain::OnListViewNetworksItemActivated, NULL, this);
+    ListViewNetworks->Connect(wxEVT_COMMAND_LIST_ITEM_DESELECTED, (wxObjectEventFunction) &WPRMain::OnListViewNetworksItemDeselect, NULL, this);
+    ListViewNetworks->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, (wxObjectEventFunction) &WPRMain::OnListViewNetworksItemSelect, NULL, this);
+    Connect(MenuItemAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnMenuItemAboutSelected);
+    Connect(MenuItemBug->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnMenuItemBugSelected);
+    Connect(MenuItemDonate->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnMenuItemDonateSelected);
+    Connect(MenuItemExportNetworks->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnMenuItemExportNetworksSelected);
+    Connect(MenuItemImportNetworks->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnMenuItemImportNetworksSelected);
+    Connect(MenuItemQuit->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnQuit);
+    Connect(MenuItemScan->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnButtonScanClick);
+    Connect(MenuItemWebsite->GetId(), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::OnMenuItemWebsiteSelected);
     UpdateNetworksList();
 }
 
 WPRMain::~WPRMain(){}
 
-typedef struct {
-    wxListView* listView;
-    int col;
-} SortInfo;
+/*** Multilanguage support ***/
+
+void WPRMain::InitLanguageMenu(wxMenu* languageMenu){
+    int i;
+    long id;
+    wxMenuItem* languageItem;
+    Language tempLang;
+    LanguageHelper* langHlpInst = LanguageHelper::GetInstance();
+    for(i = 0; i < langHlpInst->GetAvailableLanguagesCount(); i++){
+        tempLang = langHlpInst->GetAvailableLanguages()[i];
+        id = wxNewId();
+        menuLanguageItemLink[id] = i;
+        languageItem = new wxMenuItem(languageMenu, id, tempLang.name, wxEmptyString, wxITEM_RADIO);
+        languageMenu->Append(languageItem);
+        if(tempLang.langId == langHlpInst->GetCurrentLanguage()){
+            languageItem->Check();
+        }
+        Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &WPRMain::MenuLanguageHandler);
+    }
+}
+
+void WPRMain::MenuLanguageHandler(wxCommandEvent& event){
+    Language selLang;
+    LanguageHelper* langHlpInst = LanguageHelper::GetInstance();
+    if(menuLanguageItemLink.find(event.GetId()) != menuLanguageItemLink.end()){
+        selLang = langHlpInst->GetAvailableLanguages()[menuLanguageItemLink[event.GetId()]];
+        if(langHlpInst->ApplyLanguage(selLang.langId)){
+            UpdateUITexts();
+            config->Write(wxT("locale"), selLang.langId);
+            config->Flush();
+        }else{
+            wxMessageBox(_("Failed to set the specified language."), wxT("WiFi Password Recovery"), wxOK | wxICON_ERROR);
+        }
+    }
+}
+
+void WPRMain::UpdateUITexts(){
+    wxListItem listViewNetworksItem;
+    long sel = ListViewNetworks->GetFirstSelected();
+    UpdateNetworksList();
+    if(sel < ListViewNetworks->GetItemCount()){
+        ListViewNetworks->Select(sel);
+    }else{
+        ListViewNetworks->Select(ListViewNetworks->GetItemCount() - 1);
+    }
+    ListViewNetworks->GetColumn(0, listViewNetworksItem);
+    listViewNetworksItem.SetText(_("Name"));
+    ListViewNetworks->SetColumn(0, listViewNetworksItem);
+    ListViewNetworks->GetColumn(1, listViewNetworksItem);
+    listViewNetworksItem.SetText(_("Security"));
+    ListViewNetworks->SetColumn(1, listViewNetworksItem);
+    ListViewNetworks->GetColumn(2, listViewNetworksItem);
+    listViewNetworksItem.SetText(_("Encryption"));
+    ListViewNetworks->SetColumn(2, listViewNetworksItem);
+    ListViewNetworks->GetColumn(3, listViewNetworksItem);
+    listViewNetworksItem.SetText(_("Interface"));
+    ListViewNetworks->SetColumn(3, listViewNetworksItem);
+    MenuItemWebsite->SetText(wxString::Format(_("Visit %s Website"), wxT("EvolSoft")));
+    MenuItemBug->SetText(_("Report a bug..."));
+    MenuItemDonate->SetText(_("Donate"));
+    MenuItemAbout->SetText(wxString::Format(_("About %s..."), wxT("WiFi Password Recovery")));
+    MenuItemScan->SetText(wxString::Format(wxT("%s\tF1"), _("Scan")));
+    MenuItemExportNetworks->SetText(wxString::Format(wxT("%s\tF3"), _("Export networks...")));
+    MenuItemImportNetworks->SetText(wxString::Format(wxT("%s\tF2"), _("Import networks...")));
+    MenuItemQuit->SetText(wxString::Format(wxT("%s\tCtrl+Q"), _("Quit")));
+    MenuBar->SetLabelTop(0, _("File"));
+    MenuBar->SetLabelTop(1, _("Language"));
+    MenuBar->SetLabelTop(2, _("Help"));
+    ButtonRecover->SetLabel(_("Recover"));
+    ButtonRecover->SetSize(wxDefaultSize);
+    ButtonScan->SetLabel(_("Scan"));
+    ButtonScan->SetSize(wxDefaultSize);
+    Label1->SetLabel(_("Select a network from the list to show its info:"));
+}
+
+/*** End multilanguage support ***/
 
 int wxCALLBACK WPRMain::ListViewCompare(wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData){
     wxListItem l1, l2;
@@ -159,25 +259,46 @@ void WPRMain::OnListViewNetworksItemSelect(wxListEvent& event){
 }
 
 void WPRMain::OnMenuItemAboutSelected(wxCommandEvent& event){
-    WPRInfoDialog infdlg(this);
-    infdlg.ShowModal();
+    AboutDialog aboutDialog(this);
+    aboutDialog.ShowModal();
+}
+
+void WPRMain::OnMenuItemBugSelected(wxCommandEvent& event){
+    wxLaunchDefaultBrowser(wxT(WPR_ISSUES_URL));
+}
+
+void WPRMain::OnMenuItemDonateSelected(wxCommandEvent& event){
+    wxLaunchDefaultBrowser(wxT(WPR_DONATION_URL));
+}
+
+void WPRMain::OnMenuItemExportNetworksSelected(wxCommandEvent& event){
+    NetworkWizard networkWizard(this, false);
+    networkWizard.Destroy();
+}
+
+void WPRMain::OnMenuItemImportNetworksSelected(wxCommandEvent& event){
+    NetworkWizard networkWizard(this, true);
+    networkWizard.Destroy();
+}
+
+void WPRMain::OnMenuItemWebsiteSelected(wxCommandEvent& event){
+    wxLaunchDefaultBrowser(wxT(WPR_WEBSITE_URL));
 }
 
 void WPRMain::ShowNetworkInfo(){
     wxListItem sel;
-    WlanNetwork* wn;
+    WlanNetwork* network;
     sel.SetColumn(0);
     sel.SetId(ListViewNetworks->GetFirstSelected());
     sel.SetMask(wxLIST_MASK_TEXT);
     ListViewNetworks->GetItem(sel);
-    wn = WlanInfo::GetNetworkInfo(sel.GetText().wchar_str());
-    if(!wn){
-        wxMessageBox(wxT("Failed to retrieve network informations."), wxT("Error"), wxOK | wxICON_ERROR);
+    network = WlanInfo::GetNetworkInfo((wchar_t*) sel.GetText().wc_str());
+    if(!network){
+        wxMessageBox(_("Failed to retrieve wireless network data."), wxT("WiFi Password Recovery"), wxOK | wxICON_ERROR);
         return;
     }
-    WPRWlanDialog wlandlg(this);
-    wlandlg.wn = wn;
-    wlandlg.ShowModal();
+    NetworkInfoDialog networkinfodlg(this, network);
+    networkinfodlg.ShowModal();
 }
 
 void WPRMain::SortItems(int col){
@@ -194,15 +315,15 @@ void WPRMain::UpdateNetworksList(){
     WlanInfo::UpdateNetworksList();
     wnc = WlanInfo::GetNetworksCount();
     if(!wnc){
-        wxMessageBox(wxT("No WiFi networks found."), wxT("Info"), wxOK | wxICON_INFORMATION);
+        wxMessageBox(_("No Wireless networks found."), wxT("WiFi Password Recovery"), wxOK | wxICON_INFORMATION);
         return;
     }
     wn = WlanInfo::GetNetworksList();
     for(int i = 0; i < wnc; i++){
         int l;
         l = ListViewNetworks->InsertItem(0, wxString(wn[i].name, wxConvUTF8));
-        ListViewNetworks->SetItem(0, 1, wxString(WlanInfo::WlanAuthToString(wn[i].auth), wxConvUTF8));
-        ListViewNetworks->SetItem(0, 2, wxString(WlanInfo::WlanEncryptionToString(wn[i].encryption), wxConvUTF8));
+        ListViewNetworks->SetItem(0, 1, WlanInfo::WlanAuthToString(wn[i].auth));
+        ListViewNetworks->SetItem(0, 2, WlanInfo::WlanEncryptionToString(wn[i].encryption));
         ListViewNetworks->SetItem(0, 3, wxString(wn[i].intrface, wxConvUTF8));
         ListViewNetworks->SetItemData(l, i);
         ListViewNetworks->SetColumnWidth(0, wxLIST_AUTOSIZE);

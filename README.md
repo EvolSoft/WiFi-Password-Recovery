@@ -13,6 +13,11 @@ WiFi Password Recovery is a free utility to recover the passwords of the WiFi ne
 - Windows XP SP3, Vista, 7, 8.x, 10
 - A wireless network card of course
 
+## Donate
+
+If you want you can support this project with a small donation by clicking [:dollar: here](https://www.paypal.me/Flavius12). 
+Your generosity will help us paying web hosting, domains, buying programs (such as IDEs, debuggers, etc...) and new hardware to improve software development. Thank you :smile:
+
 ## Precompiled binaries
 
 Precompiled binaries of WiFi Password Recovery are available for download as installer version or portable version.
@@ -78,11 +83,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## 3rd-party libraries used
 
 - [wxWidgets](https://www.wxwidgets.org)
-
-## Donate
-
-If you want you can support this project with a small donation by clicking [:dollar: here](https://www.paypal.me/Flavius12). 
-Your generosity will help us paying web hosting, domains, buying programs (such as IDEs, debuggers, etc...) and new hardware to improve software development. Thank you :smile:
 
 ## Contributing
 

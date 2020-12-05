@@ -5,7 +5,6 @@
 [![Download WiFi Password Recovery](https://img.shields.io/sourceforge/dt/wifi-password-recovery.svg)](https://sourceforge.net/projects/wifi-password-recovery/files/latest/download)
 
 WiFi Password Recovery is a free utility to recover the passwords of the WiFi networks saved on your computer. For example if you forgot the password of a WiFi network (which you have entered in the past), you can easily recover it thanks to this tool. WiFi Password Recovery provides a very simple user interface which shows also other informations (SSID, Interface, Security type, Encryption algorithm) for each wireless network. The program is able to recover the passwords of wireless networks which use the following security types: WEP, WPA, WPA-PSK, WPA2, WPA2-PSK.*
-
 **Note: On Windows XP the passwords of WiFi networks using WPA security will be shown as 64 HEX digits. You can use these characters as password to connect to the wireless network anyway.**
 
 ## Requirements

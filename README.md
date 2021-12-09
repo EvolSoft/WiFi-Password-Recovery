@@ -41,6 +41,12 @@ or visit [this page](https://www.evolsoft.org/wifi-password-recovery/download/) 
 ![4](https://user-images.githubusercontent.com/10297075/68071419-7dcdfd80-fd7a-11e9-88f8-965b99fe3ea8.png)
 <br>*WiFi Password Recovery Wireless Networks Import Wizard*<br><br>
 
+## Translations
+
+| **Language** | **Translated by** | **Version** | **Download** |
+| --- | --- | --- | --- |
+| 🇫🇷 French | Rico.sos | 2.0 | [WiFiPasswordRecovery2.0_French.zip](https://github.com/EvolSoft/WiFi-Password-Recovery/files/7685713/WiFiPasswordRecovery2.0_French.zip) |
+
 ## Compiling source code
 
 To compile WiFi Password Recovery source code you need:
